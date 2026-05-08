@@ -50,7 +50,7 @@ TransLlama is a self-hosted translation API backend built with FastAPI and llama
 ### Prerequisites
 
 - Python 3.12+
-- [uv](https://github.com/astral-sh/uv) (recommended) or pip
+- pip or [uv](https://github.com/astral-sh/uv)
 
 ### Install
 
@@ -58,9 +58,23 @@ TransLlama is a self-hosted translation API backend built with FastAPI and llama
 git clone <repository-url>
 cd TransLlama
 
+# Create virtual environment
+python -m venv .venv
+
+# Activate virtual environment
+# Linux/macOS:
+source .venv/bin/activate
+# Windows:
+.venv\Scripts\activate
+
 # Install dependencies
-uv pip install -e .
+pip install -r requirements.txt
+
+# Or install with dev dependencies (includes testing tools)
+pip install -r requirements-dev.txt
 ```
+
+> **For GPU acceleration**, install the appropriate `llama-cpp-python` backend first — see [Hardware Acceleration](#hardware-acceleration) below.
 
 ### Download Model
 
@@ -529,24 +543,97 @@ docker run -d \
 
 ---
 
-## GPU Acceleration
+## Hardware Acceleration
+
+When installing `llama-cpp-python`, set the `CMAKE_ARGS` environment variable to select the backend. After installation, configure `n_gpu_layers` in `models.yaml` to control GPU layer offloading (`-1` = all, `0` = CPU only).
 
 ### CUDA (NVIDIA)
 
 ```bash
-CMAKE_ARGS="-DGGML_CUDA=on" FORCE_CMAKE=1 \
-  pip install llama-cpp-python --upgrade --force-reinstall --no-cache-dir
-
-# Set in models.yaml:
-# n_gpu_layers: -1    # All layers on GPU
-# n_gpu_layers: 20    # Partial offload (limited VRAM)
+# Build from source
+CMAKE_ARGS="-DGGML_CUDA=on" pip install llama-cpp-python --upgrade --force-reinstall --no-cache-dir
 ```
 
-### Vulkan (Cross-platform)
+Pre-built wheels (CUDA 12.1–12.5, Python 3.10–3.12):
 
 ```bash
-CMAKE_ARGS="-DGGML_VULKAN=on" FORCE_CMAKE=1 \
+pip install llama-cpp-python --extra-index-url https://abetlen.github.io/llama-cpp-python/whl/cu121
+# Also available: cu122 / cu123 / cu124 / cu125
+```
+
+### Metal (Apple Silicon / macOS)
+
+```bash
+CMAKE_ARGS="-DGGML_METAL=on" pip install llama-cpp-python --upgrade --force-reinstall --no-cache-dir
+```
+
+Pre-built wheels (macOS 11.0+, Python 3.10–3.12):
+
+```bash
+pip install llama-cpp-python --extra-index-url https://abetlen.github.io/llama-cpp-python/whl/metal
+```
+
+> For M-series build errors, use:
+> `CMAKE_ARGS="-DCMAKE_OSX_ARCHITECTURES=arm64 -DCMAKE_APPLE_SILICON_PROCESSOR=arm64 -DGGML_METAL=on"`
+
+### ROCm / hipBLAS (AMD)
+
+```bash
+CMAKE_ARGS="-DGGML_HIPBLAS=on" pip install llama-cpp-python --upgrade --force-reinstall --no-cache-dir
+```
+
+### Vulkan (Cross-platform: NVIDIA / AMD / Intel)
+
+```bash
+CMAKE_ARGS="-DGGML_VULKAN=on" pip install llama-cpp-python --upgrade --force-reinstall --no-cache-dir
+```
+
+### SYCL (Intel GPU / oneAPI)
+
+```bash
+# Source oneAPI environment first
+source /opt/intel/oneapi/setvars.sh
+
+CMAKE_ARGS="-DGGML_SYCL=on -DCMAKE_C_COMPILER=icx -DCMAKE_CXX_COMPILER=icpx" \
   pip install llama-cpp-python --upgrade --force-reinstall --no-cache-dir
+```
+
+### OpenBLAS (CPU acceleration)
+
+```bash
+CMAKE_ARGS="-DGGML_BLAS=ON -DGGML_BLAS_VENDOR=OpenBLAS" \
+  pip install llama-cpp-python --upgrade --force-reinstall --no-cache-dir
+```
+
+### RPC (Distributed inference)
+
+```bash
+CMAKE_ARGS="-DGGML_RPC=on" pip install llama-cpp-python --upgrade --force-reinstall --no-cache-dir
+```
+
+### CPU-only Pre-built Wheel
+
+```bash
+pip install llama-cpp-python --extra-index-url https://abetlen.github.io/llama-cpp-python/whl/cpu
+```
+
+### Windows Notes
+
+If CMake cannot find compilers, set:
+
+```powershell
+$env:CMAKE_GENERATOR = "MinGW Makefiles"
+```
+
+### Post-installation Configuration
+
+Adjust GPU offload layers in `models.yaml`:
+
+```yaml
+parameters:
+  n_gpu_layers: -1    # Offload all layers to GPU
+  n_gpu_layers: 20    # Partial offload (limited VRAM)
+  n_gpu_layers: 0     # CPU only (default)
 ```
 
 ---
@@ -593,7 +680,9 @@ TransLlama/
 ├── storage/models/                # GGUF model files (gitignored)
 ├── main.py                        # App entrypoint
 ├── models.yaml                    # Model configuration
-├── pyproject.toml                 # Dependencies
+├── pyproject.toml                 # Project metadata
+├── requirements.txt               # Runtime dependencies
+├── requirements-dev.txt           # Dev dependencies
 ├── .env.example                   # Environment template
 ├── Dockerfile                     # Container image
 ├── docker-compose.yml             # Container orchestration
@@ -629,7 +718,7 @@ All errors return a unified JSON format:
 
 ```bash
 # Install dev dependencies
-uv pip install -e ".[dev]"
+pip install -r requirements-dev.txt
 
 # Run tests
 pytest tests/
