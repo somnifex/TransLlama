@@ -1,54 +1,57 @@
-default_model: "hy-mt-general"
-fallback_model: "hy-mt-general"
+# 模型配置文件
+# 完整语言代码列表及参数说明见 README.md
+
+default_model: "hy-mt-general"       # 默认模型（未指定 model 时使用）
+fallback_model: "hy-mt-general"      # 备选模型（默认模型加载失败时使用）
 
 models:
   - name: "hy-mt-general"
-    path: "./storage/models/Hy-MT1.5-1.8B-Q4_K_M.gguf"
-    description: "General purpose translation model (Hy-MT1.5-1.8B)"
+    path: "./storage/models/HY-MT1.5-1.8B-Q4_K_M.gguf"
+    description: "General purpose translation model (Hy-MT1.5-1.8B Q4_K_M)"
     parameters:
-      n_ctx: 4096
-      n_gpu_layers: 0
-      temperature: 0.7
-      top_p: 0.6
-      top_k: 20
-      repeat_penalty: 1.05
-      max_tokens: 2048
+      n_ctx: 4096                    # 上下文窗口，不要低于 2048
+      n_gpu_layers: 0                # 0 = 纯 CPU，-1 = 全部 GPU
+      temperature: 0.7               # 采样温度
+      top_p: 0.6                     # 核采样
+      top_k: 20                      # Top-K 采样
+      repeat_penalty: 1.05           # 重复惩罚
+      max_tokens: 2048               # 最大输出 token 数
     supported_languages:
-      - zh
-      - en
-      - fr
-      - pt
-      - es
-      - ja
-      - tr
-      - ru
-      - ar
-      - ko
-      - th
-      - it
-      - de
-      - vi
-      - ms
-      - id
-      - tl
-      - hi
-      - zh-Hant
-      - pl
-      - cs
-      - nl
-      - km
-      - my
-      - fa
-      - gu
-      - ur
-      - te
-      - mr
-      - he
-      - bn
-      - ta
-      - uk
-      - bo
-      - kk
-      - mn
-      - ug
-      - yue
+      - zh          # 简体中文
+      - en          # 英语
+      - fr          # 法语
+      - pt          # 葡萄牙语
+      - es          # 西班牙语
+      - ja          # 日语
+      - tr          # 土耳其语
+      - ru          # 俄语
+      - ar          # 阿拉伯语
+      - ko          # 韩语
+      - th          # 泰语
+      - it          # 意大利语
+      - de          # 德语
+      - vi          # 越南语
+      - ms          # 马来语
+      - id          # 印尼语
+      - tl          # 菲律宾语
+      - hi          # 印地语
+      - zh-Hant     # 繁体中文
+      - pl          # 波兰语
+      - cs          # 捷克语
+      - nl          # 荷兰语
+      - km          # 高棉语
+      - my          # 缅甸语
+      - fa          # 波斯语
+      - gu          # 古吉拉特语
+      - ur          # 乌尔都语
+      - te          # 泰卢固语
+      - mr          # 马拉地语
+      - he          # 希伯来语
+      - bn          # 孟加拉语
+      - ta          # 泰米尔语
+      - uk          # 乌克兰语
+      - bo          # 藏语
+      - kk          # 哈萨克语
+      - mn          # 蒙古语
+      - ug          # 维吾尔语
+      - yue         # 粤语

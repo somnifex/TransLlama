@@ -1,7 +1,10 @@
 import logging
 from contextlib import asynccontextmanager
+from pathlib import Path
 
 from fastapi import FastAPI
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 
 from services.model_manager import ModelManager
 from services.translation_service import TranslationService
@@ -71,19 +74,12 @@ app.include_router(chat.router)
 
 @app.get("/", tags=["Root"])
 async def root():
-    """Root endpoint with API information"""
-    return {
-        "name": "TransLlama",
-        "version": "0.1.0",
-        "description": "Self-hosted translation API backend",
-        "endpoints": {
-            "health": "/health",
-            "models": "/v1/models",
-            "translate": "/v1/translate",
-            "chat_completions": "/v1/chat/completions",
-            "docs": "/docs",
-        }
-    }
+    """Serve WebUI"""
+    return FileResponse(Path(__file__).parent / "static" / "index.html")
+
+
+# Serve static assets (CSS/JS/images if added later)
+app.mount("/static", StaticFiles(directory=Path(__file__).parent / "static"), name="static")
 
 
 if __name__ == "__main__":
