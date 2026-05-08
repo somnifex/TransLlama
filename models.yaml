@@ -1,0 +1,54 @@
+default_model: "hy-mt-general"
+fallback_model: "hy-mt-general"
+
+models:
+  - name: "hy-mt-general"
+    path: "./storage/models/Hy-MT1.5-1.8B-Q4_K_M.gguf"
+    description: "General purpose translation model (Hy-MT1.5-1.8B)"
+    parameters:
+      n_ctx: 4096
+      n_gpu_layers: 0
+      temperature: 0.7
+      top_p: 0.6
+      top_k: 20
+      repeat_penalty: 1.05
+      max_tokens: 2048
+    supported_languages:
+      - zh
+      - en
+      - fr
+      - pt
+      - es
+      - ja
+      - tr
+      - ru
+      - ar
+      - ko
+      - th
+      - it
+      - de
+      - vi
+      - ms
+      - id
+      - tl
+      - hi
+      - zh-Hant
+      - pl
+      - cs
+      - nl
+      - km
+      - my
+      - fa
+      - gu
+      - ur
+      - te
+      - mr
+      - he
+      - bn
+      - ta
+      - uk
+      - bo
+      - kk
+      - mn
+      - ug
+      - yue
